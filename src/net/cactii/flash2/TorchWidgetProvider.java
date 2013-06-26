@@ -6,7 +6,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -112,13 +111,11 @@ public class TorchWidgetProvider extends AppWidgetProvider {
     public void updateState(Context context, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        Intent stateIntent = context.registerReceiver(null,
-                new IntentFilter(TorchSwitch.TORCH_STATE_CHANGED));
-        boolean on = stateIntent != null && stateIntent.getIntExtra("state", 0) != 0;
 
         views.setOnClickPendingIntent(R.id.btn, getLaunchPendingIntent(context, appWidgetId, 0));
 
-        if (on) {
+        if ((Settings.System.getInt(context.getContentResolver(),
+                Settings.System.TORCH_STATE, 0) == 1)) {
             views.setImageViewResource(R.id.img_torch, WidgetState.ON.getImgDrawable());
             views.setImageViewResource(R.id.ind_torch, WidgetState.ON.getIndDrawable());
         } else {

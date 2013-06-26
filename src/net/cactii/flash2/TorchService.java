@@ -120,7 +120,8 @@ public class TorchService extends Service {
         mNotificationManager.notify(getString(R.string.app_name).hashCode(), mNotification);
 
         startForeground(getString(R.string.app_name).hashCode(), mNotification);
-        updateState(true);
+        Settings.System.putInt(this.getContentResolver(), Settings.System.TORCH_STATE, 1);
+        this.sendBroadcast(new Intent(TorchSwitch.TORCH_STATE_CHANGED));
         return START_STICKY;
     }
 
@@ -131,13 +132,8 @@ public class TorchService extends Service {
         this.mTorchTimer.cancel();
         this.mStrobeTimer.cancel();
         FlashDevice.instance(mContext).setFlashMode(FlashDevice.OFF);
-        updateState(false);
-    }
-
-    private void updateState(boolean on) {
-        Intent intent = new Intent(TorchSwitch.TORCH_STATE_CHANGED);
-        intent.putExtra("state", on ? 1 : 0);
-        sendStickyBroadcast(intent);
+        Settings.System.putInt(this.getContentResolver(), Settings.System.TORCH_STATE, 0);
+        this.sendBroadcast(new Intent(TorchSwitch.TORCH_STATE_CHANGED));
     }
 
     public void Reshedule(int period) {
